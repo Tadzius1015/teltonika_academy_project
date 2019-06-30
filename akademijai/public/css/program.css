@@ -1,0 +1,103 @@
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th
+{
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.countriesColor {
+    color: black;
+    text-decoration: none;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+.paging {
+    display: inline-block;
+}
+
+.paging a {
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+.paging a.active {
+    color: white;
+    background-color: #ffb41b;
+}
+
+.paging a:hover:not(.active) {
+    background-color: #dddddd;
+}
+
+.center {
+    text-align: center;
+}
+
+.right {
+    text-align: right;
+}
+
+.cursor {
+    cursor: pointer;
+}
+
+.buttonLink1 {
+    background-color: #3eaaff;
+    font-size: 18px;
+    text-decoration: none;
+    padding: 5px 25px;
+    color: white;
+    border-radius: 4px;
+}
+
+.buttonLink2 {
+    background-color: #2a4365;
+    font-size: 18px;
+    text-decoration: none;
+    padding: 5px 25px;
+    color: white;
+    border-radius: 4px;
+}
+
+.buttonDanger {
+    background-color: #ff2621;
+    font-size: 18px;
+    text-decoration: none;
+    padding: 5px 25px;
+    color: white;
+    border-radius: 4px;
+}
+
+button {
+    background-color: white;
+    font-size: 18px;
+    text-decoration: none;
+    padding: 5px 20px;
+    color: black;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #555555;
+    color: white;
+}
+
+.inputForAddOrEdit {
+    width: 10%;
+    padding: 6px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+
+.addOrEditForm {
+    right: 50%;
+}
