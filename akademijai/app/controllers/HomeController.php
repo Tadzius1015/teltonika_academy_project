@@ -7,7 +7,7 @@ class HomeController extends Controller
         $this->activate();
         if (isset($_SESSION['filterStatus'])) {
             if (isset($_SESSION['sort'])) {
-                $result = $this->choice();
+                $result = $this->choiceToGetData();
                 $pagesCount = $this->pages($this->tableElementFilterCount());
                 $this->view('countries', ['result' => $result, 'pagesCount' => $pagesCount,  'editStatus' => false]);
             }
@@ -15,13 +15,13 @@ class HomeController extends Controller
         }
         if (isset($_SESSION['searchStatus'])) {
             if (isset($_SESSION['sort'])) {
-                $result = $this->choice();
+                $result = $this->choiceToGetData();
                 $pagesCount = $this->pages($this->tableElementSearchedCount());
                 $this->view('countries', ['result' => $result, 'pagesCount' => $pagesCount,  'editStatus' => false]);
             }
             $this->searchData();
         }
-        $result = $this->choice();
+        $result = $this->choiceToGetData();
         $pagesCount = $this->pages($this->tableElementCount());
         $this->view('countries', ['result' => $result, 'pagesCount' => $pagesCount,  'editStatus' => false]);
     }
@@ -60,8 +60,8 @@ class HomeController extends Controller
         $country_inhabitants_count = $_POST['inhabitants_count'];
         $country_phone_code = $_POST['phone_code'];
         $today_date = date("Y-m-d");
-        $data = "INSERT INTO countries(name, area, inhabitants_count, phone_code, date_created) VALUES ('$countryName', '$countryArea',
-                                                  $country_inhabitants_count, $country_phone_code, '$today_date')";
+        $data = "INSERT INTO countries(name, area, inhabitants_count, phone_code, date_created) VALUES ('$countryName',
+                                    '$countryArea',$country_inhabitants_count, $country_phone_code, '$today_date')";
         $query = $connection->query($data);
         $_POST = '';
         $connection->close();
@@ -70,7 +70,6 @@ class HomeController extends Controller
 
     public function deleteCountryAndCities()
     {
-        var_dump($_SESSION['currentPageNumber']);
         $id = intval($_GET['id']);
         $connection = $this->connect();
 
@@ -105,7 +104,7 @@ class HomeController extends Controller
             $allCountries = $this->searchData();
             $pagesCount = $this->pages($this->tableElementSearchedCount());
         } else {
-            $allCountries = $this->choice();
+            $allCountries = $this->choiceToGetData();
             $pagesCount = $this->pages($this->tableElementCount());
         }
         $data = "SELECT * FROM countries WHERE id = '$id'";
@@ -114,7 +113,8 @@ class HomeController extends Controller
             $finalResult[] = $tmp;
         }
         $connection->close();
-        $this->view('countries', ['country' => $finalResult, 'pagesCount' => $pagesCount, 'result' => $allCountries, 'editStatus' => true]);
+        $this->view('countries', ['country' => $finalResult, 'pagesCount' => $pagesCount,
+            'result' => $allCountries, 'editStatus' => true]);
     }
 
     public function updateCountryById()
@@ -125,14 +125,14 @@ class HomeController extends Controller
         $country_inhabitants_count = $_POST['inhabitants_count'];
         $country_phone_code = $_POST['phone_code'];
         $connection = $this->connect();
-        $sql = "UPDATE countries SET name = '$countryName', area = '$countryArea', inhabitants_count = '$country_inhabitants_count',
-phone_code = '$country_phone_code' WHERE id = '$id'";
+        $sql = "UPDATE countries SET name = '$countryName', area = '$countryArea', 
+            inhabitants_count = '$country_inhabitants_count', phone_code = '$country_phone_code' WHERE id = '$id'";
         $result = $connection->query($sql);
         $connection->close();
         $this->index();
     }
 
-    public function choice()
+    public function choiceToGetData()
     {
         if (isset($_SESSION['sort'])) {
             $result = $this->getSortedData();
@@ -150,23 +150,25 @@ phone_code = '$country_phone_code' WHERE id = '$id'";
             $date = $_SESSION['date'];
             $sql_asc = "SELECT * FROM countries WHERE date_created = '$date' ORDER BY name ASC LIMIT 10 OFFSET $offset";
             $sql_desc = "SELECT * FROM countries WHERE date_created = '$date' ORDER BY name DESC LIMIT 10 OFFSET $offset";
-            $finalResult = $this->sortData($sql_asc, $sql_desc, $offset);
+            $finalResult = $this->sortData($sql_asc, $sql_desc);
             return $finalResult;
         } else if (isset($_SESSION['searchStatus'])) {
             $text = $_SESSION['search_text'];
-            $sql_asc = "SELECT * FROM countries WHERE name LIKE '%$text%' OR area LIKE '%$text%' OR inhabitants_count LIKE '%$text%' OR phone_code LIKE '%$text%' ORDER BY name ASC LIMIT 10 OFFSET $offset";
-            $sql_desc = "SELECT * FROM countries WHERE name LIKE '%$text%' OR area LIKE '%$text%' OR inhabitants_count LIKE '%$text%' OR phone_code LIKE '%$text%' ORDER BY name DESC LIMIT 10 OFFSET $offset";
-            $finalResult = $this->sortData($sql_asc, $sql_desc, $offset);
+            $sql_asc = "SELECT * FROM countries WHERE name LIKE '%$text%' OR area LIKE '%$text%' 
+            OR inhabitants_count LIKE '%$text%' OR phone_code LIKE '%$text%' ORDER BY name ASC LIMIT 10 OFFSET $offset";
+            $sql_desc = "SELECT * FROM countries WHERE name LIKE '%$text%' OR area LIKE '%$text%' 
+            OR inhabitants_count LIKE '%$text%' OR phone_code LIKE '%$text%' ORDER BY name DESC LIMIT 10 OFFSET $offset";
+            $finalResult = $this->sortData($sql_asc, $sql_desc);
             return $finalResult;
         } else {
             $sql_asc = "SELECT * FROM countries ORDER BY name ASC LIMIT 10 OFFSET $offset";
             $sql_desc = "SELECT * FROM countries ORDER BY name DESC LIMIT 10 OFFSET $offset";
-            $finalResult = $this->sortData($sql_asc, $sql_desc, $offset);
+            $finalResult = $this->sortData($sql_asc, $sql_desc);
             return $finalResult;
         }
     }
 
-    public function sortData($sql_asc, $sql_desc, $offset)
+    public function sortData($sql_asc, $sql_desc)
     {
         $finalResult = [];
         $connection = $this->connect();
@@ -184,6 +186,7 @@ phone_code = '$country_phone_code' WHERE id = '$id'";
             }
         }
         $connection->close();
+
         return $finalResult;
     }
 
@@ -199,6 +202,7 @@ phone_code = '$country_phone_code' WHERE id = '$id'";
             $finalResult[] = $tmp;
         }
         $connection->close();
+
         return $finalResult;
     }
     public function pages($elementsCount)
@@ -232,7 +236,6 @@ phone_code = '$country_phone_code' WHERE id = '$id'";
         while ($tmp = $result->fetch_assoc()) {
             $finalResult[] = $tmp;
         }
-        //var_dump($_SESSION['filterStatuss']);
         $connection->close();
         if (isset($_SESSION['filterStatuss'])) {
             $_SESSION['result'] = $finalResult;
@@ -242,6 +245,7 @@ phone_code = '$country_phone_code' WHERE id = '$id'";
             $pagesCount = $this->pages($this->tableElementFilterCount());
             $this->view('countries', ['result' => $finalResult, 'pagesCount' => $pagesCount, 'editStatus' => false]);
         }
+
         return 0;
     }
 
@@ -280,6 +284,7 @@ phone_code = '$country_phone_code' WHERE id = '$id'";
             echo "Error " . mysqli_connect_error();
             die();
         }
+
         return $connection;
     }
 
@@ -294,7 +299,9 @@ phone_code = '$country_phone_code' WHERE id = '$id'";
     {
         $convertedData = $_SESSION['date'];
         $connection = $this->connect();
-        $elementsCount = mysqli_num_rows(mysqli_query($connection, "SELECT * FROM countries WHERE date_created = '$convertedData'"));
+        $elementsCount = mysqli_num_rows(mysqli_query($connection, "SELECT * FROM countries 
+        WHERE date_created = '$convertedData'"));
+
         return $elementsCount;
     }
 
@@ -302,7 +309,9 @@ phone_code = '$country_phone_code' WHERE id = '$id'";
     {
         $text = $_SESSION['search_text'];
         $connection = $this->connect();
-        $elementsCount = mysqli_num_rows(mysqli_query($connection, "SELECT * FROM countries WHERE name LIKE '%$text%' OR area LIKE '%$text%' OR inhabitants_count LIKE '%$text%' OR phone_code LIKE '%$text%'"));
+        $elementsCount = mysqli_num_rows(mysqli_query($connection, "SELECT * FROM countries WHERE name 
+            LIKE '%$text%' OR area LIKE '%$text%' OR inhabitants_count LIKE '%$text%' OR phone_code LIKE '%$text%'"));
+
         return $elementsCount;
     }
 

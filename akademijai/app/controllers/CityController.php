@@ -9,23 +9,26 @@ class CityController extends Controller
         $this->activate();
         if (isset($_SESSION['filterStatus'])) {
             if (isset($_SESSION['sort'])) {
-                $result = $this->choice();
+                $result = $this->choiceToGetData();
                 $pagesCount = $this->pages($this->tableElementFilterCount());
-                $this->view('cities', ['result' => $result, 'countryId' => $id, 'pagesCount' => $pagesCount,  'editStatus' => false]);
+                $this->view('cities', ['result' => $result, 'countryId' => $id, 'pagesCount' => $pagesCount,
+                    'editStatus' => false]);
             }
             $this->filterDataByDate();
         }
         if (isset($_SESSION['searchStatus'])) {
             if (isset($_SESSION['sort'])) {
-                $result = $this->choice();
+                $result = $this->choiceToGetData();
                 $pagesCount = $this->pages($this->tableElementSearchedCount());
-                $this->view('cities', ['result' => $result, 'countryId' => $id, 'pagesCount' => $pagesCount,  'editStatus' => false]);
+                $this->view('cities', ['result' => $result, 'countryId' => $id, 'pagesCount' => $pagesCount,
+                    'editStatus' => false]);
             }
             $this->searchData();
         }
-        $result = $this->choice();
+        $result = $this->choiceToGetData();
         $pagesCount = $this->pages($this->tableElementCount());
-        $this->view('cities', ['result' => $result, 'countryId' => $id, 'pagesCount' => $pagesCount,  'editStatus' => false]);
+        $this->view('cities', ['result' => $result, 'countryId' => $id, 'pagesCount' => $pagesCount,
+            'editStatus' => false]);
     }
 
     public function activate()
@@ -62,8 +65,8 @@ class CityController extends Controller
         $city_inhabitants_count = $_POST['inhabitants_count'];
         $city_postal_code = $_POST['postal_code'];
         $today_date = date('Y-m-d');
-        $data = "INSERT INTO cities(name, area, inhabitants_count, postal_code, date_created, fk_countryId) VALUES ('$cityName', '$cityArea',
-                                                  $city_inhabitants_count, $city_postal_code, '$today_date', $id)";
+        $data = "INSERT INTO cities(name, area, inhabitants_count, postal_code, date_created, fk_countryId) 
+                     VALUES ('$cityName', '$cityArea', $city_inhabitants_count, $city_postal_code, '$today_date', $id)";
         $query = $connection->query($data);
         $_POST = '';
         $connection->close();
@@ -72,7 +75,6 @@ class CityController extends Controller
 
     public function deleteCity()
     {
-        var_dump($_SESSION['currentPageNumber']);
         $id = intval($_GET['id']);
         $connection = $this->connect();
 
@@ -102,7 +104,7 @@ class CityController extends Controller
             $allCities = $this->searchData();
             $pagesCount = $this->pages($this->tableElementSearchedCount());
         } else {
-            $allCities = $this->choice();
+            $allCities = $this->choiceToGetData();
             $pagesCount = $this->pages($this->tableElementCount());
         }
         $data = "SELECT * FROM cities WHERE id = '$id'";
@@ -111,7 +113,8 @@ class CityController extends Controller
             $finalResult[] = $tmp;
         }
         $connection->close();
-        $this->view('cities', ['city' => $finalResult, 'countryId' => $_SESSION['countryId'], 'pagesCount' => $pagesCount, 'result' => $allCities, 'editStatus' => true]);
+        $this->view('cities', ['city' => $finalResult, 'countryId' => $_SESSION['countryId'],
+            'pagesCount' => $pagesCount, 'result' => $allCities, 'editStatus' => true]);
     }
 
     public function updateCity()
@@ -129,7 +132,7 @@ postal_code = '$city_postal_code' WHERE id = '$id'";
         $this->index();
     }
 
-    public function choice()
+    public function choiceToGetData()
     {
         if (isset($_SESSION['sort'])) {
             $result = $this->getSortedData();
@@ -146,20 +149,27 @@ postal_code = '$city_postal_code' WHERE id = '$id'";
         $countryId = $_SESSION['countryId'];
         if (isset($_SESSION['filterStatus'])) {
             $date = $_SESSION['date'];
-            $sql_asc = "SELECT * FROM cities WHERE date_created = '$date' AND fk_countryId = '$countryId' ORDER BY name ASC LIMIT 10 OFFSET $offset";
-            $sql_desc = "SELECT * FROM cities WHERE date_created = '$date' AND fk_countryId = '$countryId' ORDER BY name DESC LIMIT 10 OFFSET $offset";
+            $sql_asc = "SELECT * FROM cities WHERE date_created = '$date' AND fk_countryId = '$countryId' 
+                        ORDER BY name ASC LIMIT 10 OFFSET $offset";
+            $sql_desc = "SELECT * FROM cities WHERE date_created = '$date' AND fk_countryId = '$countryId' 
+                         ORDER BY name DESC LIMIT 10 OFFSET $offset";
             $finalResult = $this->sortData($sql_asc, $sql_desc);
             return $finalResult;
         } else if (isset($_SESSION['searchStatus'])) {
             $text = $_SESSION['search_text'];
-            $sql_asc = "SELECT * FROM cities WHERE name LIKE '%$text%' OR area LIKE '%$text%' OR inhabitants_count LIKE '%$text%' OR postal_code LIKE '%$text%' AND fk_countryId = '$countryId' ORDER BY name ASC LIMIT 10 OFFSET $offset";
-            $sql_desc = "SELECT * FROM cities WHERE name LIKE '%$text%' OR area LIKE '%$text%' OR inhabitants_count LIKE '%$text%' OR postal_code LIKE '%$text%' AND fk_countryId = '$countryId' ORDER BY name DESC LIMIT 10 OFFSET $offset";
+            $sql_asc = "SELECT * FROM cities WHERE name LIKE '%$text%' OR area LIKE '%$text%' OR inhabitants_count 
+            LIKE '%$text%' OR postal_code LIKE '%$text%' AND fk_countryId = '$countryId' ORDER BY name ASC LIMIT 10 
+            OFFSET $offset";
+            $sql_desc = "SELECT * FROM cities WHERE name LIKE '%$text%' OR area LIKE '%$text%' OR inhabitants_count 
+            LIKE '%$text%' OR postal_code LIKE '%$text%' AND fk_countryId = '$countryId' ORDER BY name DESC LIMIT 10 
+            OFFSET $offset";
             $finalResult = $this->sortData($sql_asc, $sql_desc);
             return $finalResult;
         } else {
             $sql_asc = "SELECT * FROM cities WHERE fk_countryId = '$countryId' ORDER BY name ASC LIMIT 10 OFFSET $offset";
             $sql_desc = "SELECT * FROM cities WHERE fk_countryId = '$countryId' ORDER BY name DESC LIMIT 10 OFFSET $offset";
             $finalResult = $this->sortData($sql_asc, $sql_desc);
+
             return $finalResult;
         }
     }
@@ -182,6 +192,7 @@ postal_code = '$city_postal_code' WHERE id = '$id'";
             }
         }
         $connection->close();
+
         return $finalResult;
     }
 
@@ -198,6 +209,7 @@ postal_code = '$city_postal_code' WHERE id = '$id'";
             $finalResult[] = $tmp;
         }
         $connection->close();
+
         return $finalResult;
     }
     public function pages($elementsCount)
@@ -227,12 +239,12 @@ postal_code = '$city_postal_code' WHERE id = '$id'";
         $convertedData = $_SESSION['date'];
         $_SESSION['filterStatus'] = true;
         $connection = $this->connect();
-        $sql = "SELECT * FROM cities WHERE date_created = '$convertedData' AND fk_countryId = '$countryId' LIMIT 10 OFFSET $offset";
+        $sql = "SELECT * FROM cities WHERE date_created = '$convertedData' AND fk_countryId = '$countryId' 
+                LIMIT 10 OFFSET $offset";
         $result = $connection->query($sql);
         while ($tmp = $result->fetch_assoc()) {
             $finalResult[] = $tmp;
         }
-        //var_dump($_SESSION['filterStatuss']);
         $connection->close();
         if (isset($_SESSION['filterStatuss'])) {
             $_SESSION['result'] = $finalResult;
@@ -242,6 +254,7 @@ postal_code = '$city_postal_code' WHERE id = '$id'";
             $pagesCount = $this->pages($this->tableElementFilterCount());
             $this->view('cities', ['result' => $finalResult, 'countryId' => $countryId, 'pagesCount' => $pagesCount, 'editStatus' => false]);
         }
+
         return 0;
     }
 
@@ -281,6 +294,7 @@ postal_code = '$city_postal_code' WHERE id = '$id'";
             echo "Klaida " . mysqli_connect_error();
             die();
         }
+
         return $connection;
     }
 
@@ -289,6 +303,7 @@ postal_code = '$city_postal_code' WHERE id = '$id'";
         $countryId = $_SESSION['countryId'];
         $connection = $this->connect();
         $elementsCount = mysqli_num_rows(mysqli_query($connection, "SELECT * FROM cities WHERE fk_countryId = '$countryId'"));
+
         return $elementsCount;
     }
 
@@ -298,6 +313,7 @@ postal_code = '$city_postal_code' WHERE id = '$id'";
         $convertedData = $_SESSION['date'];
         $connection = $this->connect();
         $elementsCount = mysqli_num_rows(mysqli_query($connection, "SELECT * FROM cities WHERE date_created = '$convertedData' AND fk_countryId = '$countryId'"));
+
         return $elementsCount;
     }
 
@@ -307,6 +323,7 @@ postal_code = '$city_postal_code' WHERE id = '$id'";
         $text = $_SESSION['search_text'];
         $connection = $this->connect();
         $elementsCount = mysqli_num_rows(mysqli_query($connection, "SELECT * FROM cities WHERE name LIKE '%$text%' OR area LIKE '%$text%' OR inhabitants_count LIKE '%$text%' OR postal_code LIKE '%$text%' AND fk_countryId = '$countryId'"));
+
         return $elementsCount;
     }
 
@@ -314,7 +331,6 @@ postal_code = '$city_postal_code' WHERE id = '$id'";
     {
         $this->clearFilter();
         $countryId = $_SESSION['countryId'];
-        var_dump($countryId);
         $offset = ($_SESSION['currentPageNumber'] - 1) * 10;
         $_SESSION['searchStatus'] = true;
         $finalResult = [];
@@ -323,7 +339,8 @@ postal_code = '$city_postal_code' WHERE id = '$id'";
         }
         $text = $_SESSION['search_text'];
         $connection = $this->connect();
-        $sql = "SELECT * FROM cities WHERE fk_countryId = '$countryId' AND name LIKE '%$text%' OR area LIKE '%$text%' OR inhabitants_count LIKE '%$text%' OR postal_code LIKE '%$text%' LIMIT 10 OFFSET $offset";
+        $sql = "SELECT * FROM cities WHERE fk_countryId = '$countryId' AND name LIKE '%$text%' OR area LIKE '%$text%' 
+                OR inhabitants_count LIKE '%$text%' OR postal_code LIKE '%$text%' LIMIT 10 OFFSET $offset";
         $result = $connection->query($sql);
         while ($tmp = $result->fetch_assoc()) {
             $finalResult[] = $tmp;
@@ -337,6 +354,7 @@ postal_code = '$city_postal_code' WHERE id = '$id'";
             $pagesCount = $this->pages($this->tableElementSearchedCount());
             $this->view('cities', ['result' => $finalResult, 'countryId' => $countryId, 'pagesCount' => $pagesCount, 'editStatus' => false]);
         }
+
         return 0;
     }
 }
