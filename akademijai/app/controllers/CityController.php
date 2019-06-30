@@ -68,7 +68,6 @@ class CityController extends Controller
         $data = "INSERT INTO cities(name, area, inhabitants_count, postal_code, date_created, fk_countryId) 
                      VALUES ('$cityName', '$cityArea', $city_inhabitants_count, $city_postal_code, '$today_date', $id)";
         $query = $connection->query($data);
-        $_POST = '';
         $connection->close();
         $this->clear();
     }

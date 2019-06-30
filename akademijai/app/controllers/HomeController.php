@@ -63,7 +63,6 @@ class HomeController extends Controller
         $data = "INSERT INTO countries(name, area, inhabitants_count, phone_code, date_created) VALUES ('$countryName',
                                     '$countryArea',$country_inhabitants_count, $country_phone_code, '$today_date')";
         $query = $connection->query($data);
-        $_POST = '';
         $connection->close();
         $this->clear();
     }
